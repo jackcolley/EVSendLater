@@ -55,7 +55,7 @@ open class EVSendLater : NSObject {
     }
     
     open func getSavesForUrl(_ url:String, delete:Bool) -> [[String:AnyObject]]?{
-        return (saves.object(forKey: url)? as AnyObject).copy() as? [[String:AnyObject]]
+        return saves.object(forKey: url) as? [[String: AnyObject]]
     }
     
     open func getAllSaves() -> NSDictionary{
