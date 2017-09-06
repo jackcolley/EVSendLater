@@ -6,15 +6,15 @@
 //
 //
 
-public class EVSendLater : NSObject {
+open class EVSendLater : NSObject {
     
-    private var saves:NSMutableDictionary!
-    private var savesChanged = false
-    private var savesCreated = false
-    private let path = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as NSString).stringByAppendingPathComponent("EVSendLaters")
-    public var saveImmediately = false
+    fileprivate var saves:NSMutableDictionary!
+    fileprivate var savesChanged = false
+    fileprivate var savesCreated = false
+    fileprivate let path = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent("EVSendLaters")
+    open var saveImmediately = false
     
-    public class var sharedManager : EVSendLater {
+    open class var sharedManager : EVSendLater {
         struct Static {
             static let instance : EVSendLater = EVSendLater()
             
@@ -23,11 +23,11 @@ public class EVSendLater : NSObject {
         return Static.instance
     }
     
-    private func initializeSaves(){
+    fileprivate func initializeSaves(){
         if !savesCreated{
-            let fileManager = NSFileManager.defaultManager()
+            let fileManager = FileManager.default
             
-            if !fileManager.fileExistsAtPath(path){
+            if !fileManager.fileExists(atPath: path){
                 saves = NSMutableDictionary()
             } else{
                 saves = NSMutableDictionary(contentsOfFile: path)
@@ -38,33 +38,33 @@ public class EVSendLater : NSObject {
     }
     
     
-    public func saveForLater(url:String, params:[NSObject:AnyObject]){
-        if let list = saves.objectForKey(url) as? NSMutableArray{
-            list.addObject(params)
+    open func saveForLater(_ url:String, params:[AnyHashable: Any]){
+        if let list = saves.object(forKey: url) as? NSMutableArray{
+            list.add(params)
         } else{
-            saves.setObject(NSMutableArray(array: [params]), forKey: url)
+            saves.setObject(NSMutableArray(array: [params]), forKey: url as NSCopying)
         }
         
         setSavesChanged()
     }
     
-    public func synchronizeSaves(){
+    open func synchronizeSaves(){
         if savesChanged{
-            savesChanged = !saves.writeToFile(path, atomically: true)
+            savesChanged = !saves.write(toFile: path, atomically: true)
         }
     }
     
-    public func getSavesForUrl(url:String, delete:Bool) -> [[String:AnyObject]]?{
-        return saves.objectForKey(url)?.copy() as? [[String:AnyObject]]
+    open func getSavesForUrl(_ url:String, delete:Bool) -> [[String:AnyObject]]?{
+        return (saves.object(forKey: url)? as AnyObject).copy() as? [[String:AnyObject]]
     }
     
-    public func getAllSaves() -> NSDictionary{
+    open func getAllSaves() -> NSDictionary{
         return saves
     }
     
-    public func removeFromSaves(url:String, params:[String:AnyObject]){
-        if let array = saves.objectForKey(url) as? NSMutableArray{
-            array.removeObject(params)
+    open func removeFromSaves(_ url:String, params:[String:AnyObject]){
+        if let array = saves.object(forKey: url) as? NSMutableArray{
+            array.remove(params)
             setSavesChanged()
         }
     }
